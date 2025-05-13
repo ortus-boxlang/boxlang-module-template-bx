@@ -11,7 +11,7 @@
 	},
 	"bugs": "https://ortussolutions.atlassian.net/browse/BLMODULES",
 	"slug": "@MODULE_SLUG@",
-	"shortDescription": "Module template for BoxLang modules written in BoxLang",
+	"shortDescription": "@MODULE_DESCRIPTION@",
 	"type": "boxlang-modules",
 	"keywords": ["boxlang"],
 	"boxlang": {

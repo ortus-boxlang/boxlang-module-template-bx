@@ -1,4 +1,4 @@
-# ⚡︎ BoxLang Module: @MODULE_NAME@
+# ⚡︎ @MODULE_NAME@
 
 ```
 |:------------------------------------------------------:|
@@ -16,10 +16,14 @@
 
 <p>&nbsp;</p>
 
+@MODULE_DESCRIPTION@
+
+---- 
+
 This template can be used to create Ortus based BoxLang Modules written in BoxLang. To use, just click the `Use this Template` button in the github repository: https://github.com/ortus-boxlang/boxlang-module-template-bx and run the setup task from where you cloned it.
 
 ```bash
-box task run taskFile=src/build/SetupTemplate
+boxlang SetupTemplate.bx
 ```
 
 The `SetupTemplate` task will ask you for your module name, id and description and configure the template for you! Enjoy!
@@ -29,44 +33,22 @@ The `SetupTemplate` task will ask you for your module name, id and description a
 Here is a brief overview of the directory structure:
 
 -   `.github/workflows` - These are the github actions to test and build the module via CI
--   `build` - This is a temporary non-sourced folder that contains the build assets for the module that gradle produces
--   `gradle` - The gradle wrapper and configuration
--   `src` - Where your module source code lives
--   `.cfformat.json` - A CFFormat using the Ortus Standards
+-   `.vscode` - VScode additions
+-   `bifs` - Where you can code Built in Functions for BoxLang
+-   `components` - Where you can code BoxLang components
+-   `interceptors` - Where you can code BoxLang interceptors
+-   `lib` - Place any Jar's or classes for your module that will be class loaded for you
+-   `models` - Any models available to the runtime using `bxModules.{mapping}.models` path
+-   `.cfformat.json` - A format config using the Ortus Standards
 -   `.editorconfig` - Smooth consistency between editors
 -   `.gitattributes` - Git attributes
 -   `.gitignore` - Basic ignores. Modify as needed.
 -   `.markdownlint.json` - A linting file for markdown docs
--   `.ortus-java-style.xml` - Ortus Java Style for IntelliJ, VScode, Eclipse.
 -   `box.json` - The box.json for your module used to publish to ForgeBox
--   `build.gradle` - The gradle build file for the module
 -   `changelog.md` - A nice changelog tracking file
 -   `CONTRIBUTING.md` - A contribution guideline
--   `gradlew` - The gradle wrapper
--   `gradlew.bat` - The gradle wrapper for windows
--   `ModuleConfig.cfc` - Your module's configuration. Modify as needed.
+-   `ModuleConfig.bx` - Your module's configuration file
 -   `readme.md` - Your module's readme. Modify as needed.
--   `settings.gradle` - The gradle settings file
-
-Here is a brief overview of the source directory structure:
-
--   `build` - Build scripts and assets
--   `main` - The main module source code
-    -   `bx` - The BoxLang source code
-    -   `ModuleConfig.bx` - The BoxLang module configuration
-        -   `bifs` - BoxLang built-in functions
-        -   `components` - BoxLang components
-        -   `config` - BoxLang configuration, schedulers, etc.
-        -   `interceptors` - BoxLang interceptors
-        -   `libs` - Java libraries to use that are NOT managed by gradle
-        -   `models` - BoxLang models
-    -   `java` - Java source code
-    -   `resources` - Resources for the module placed in final jar
--   `test`
-    -   `bx` - The BoxLang test code
-    -   `java` - Java test code
-    -   `resources` - Resources for testing
-        -   `libs` - BoxLang binary goes here for now.
 
 ## Github Actions Automation
 
