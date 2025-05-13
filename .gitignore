@@ -1,0 +1,14 @@
+### Temporary Folders ###
+.gradle
+!gradle/wrapper/gradle-wrapper.jar
+build/**
+bin/**
+.engine
+.tmp
+.artifacts
+
+### IntelliJ IDEA ###
+.idea/
+
+### Mac OS ###
+.DS_Store
