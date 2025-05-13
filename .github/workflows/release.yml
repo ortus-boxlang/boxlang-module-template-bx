@@ -24,7 +24,6 @@ on:
 env:
   MODULE_ID: ${{ github.event.repository.name }}
   JDK: 21
-  GRADLE: 8.7
   BUILD_ID: ${{ github.run_number }}
   SNAPSHOT: ${{ inputs.snapshot || false }}
 
@@ -55,32 +54,23 @@ jobs:
           distribution: "temurin"
           java-version: ${{ env.JDK }}
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-version: ${{ env.GRADLE }}
-
       - name: Setup Environment Variables For Build Process
         id: current_version
         run: |
-          # Read Version from gradle.properties
-          TMPVERSION=$(grep '^version=' gradle.properties | cut -d'=' -f2)
-          # Replace existing prerelease identifier with -snapshot or append -snapshot if none exists
-          # If we are on the development branch, we always append -snapshot
-          if [[ "${{ github.ref }}" == "refs/heads/development" ]]; then
-            TMPVERSION=$(echo $TMPVERSION | sed 's/-.*$//')-snapshot
-          fi
-          # Set the version in the environment
-          echo "VERSION=$TMPVERSION" >> $GITHUB_ENV
+          # Extract version from box.json and store it in MODULE_VERSION
+          MODULE_VERSION=$(cat box.json | jq -r '.version')
+          echo "MODULE_VERSION=$MODULE_VERSION" >> $GITHUB_ENV
 
-          # Branch
+          # Set package version dynamically according to build process
+          box package set version=@build.version@+@build.number@
+
+          # Snapshot builds are always on the development branch
           echo "Github Ref is $GITHUB_REF"
-          echo "BRANCH=main" >> $GITHUB_ENV
-
-          # Snapshot
+          echo "BRANCH=master" >> $GITHUB_ENV
           if [ $GITHUB_REF == 'refs/heads/development' ]
           then
             echo "BRANCH=development" >> $GITHUB_ENV
+            echo "MODULE_VERSION=${MODULE_VERSION}-snapshot" >> $GITHUB_ENV
           fi
 
       - name: Update changelog [unreleased] with latest version
@@ -88,14 +78,13 @@ jobs:
         if: env.SNAPSHOT == 'false'
         with:
           changelogPath: ./changelog.md
-          tag: v${{ env.VERSION }}
+          tag: v${{ env.MODULE_VERSION }}
 
       - name: Build it!
         run: |
           npm install -g markdownlint-cli
           markdownlint changelog.md --fix
-          gradle downloadBoxLang
-          gradle build -x test --stacktrace --console=plain
+          boxlang Build.bx
 
       - name: Commit Changelog [unreleased] with latest version
         uses: EndBug/add-and-commit@v9.1.4
@@ -103,16 +92,16 @@ jobs:
         with:
           author_name: Github Actions
           author_email: info@ortussolutions.com
-          message: "Finalized changelog for v${{ env.VERSION }}"
+          message: "Finalized changelog for v${{ env.MODULE_VERSION }}"
           add: changelog.md
 
       - name: Tag Version
         uses: rickstaa/action-create-tag@v1.7.2
         if: env.SNAPSHOT == 'false'
         with:
-          tag: "v${{ env.VERSION }}"
+          tag: "v${{ env.MODULE_VERSION }}"
           force_push_tag: true
-          message: "Latest Release v${{ env.VERSION }}"
+          message: "Latest Release v${{ env.MODULE_VERSION }}"
 
       - name: Upload Build Artifacts
         if: success()
@@ -120,7 +109,6 @@ jobs:
         with:
           name: boxlang-build
           path: |
-            build/reports/tests/**
             changelog.md
 
       - name: Upload Distributions to S3
@@ -131,19 +119,19 @@ jobs:
           AWS_S3_BUCKET: "downloads.ortussolutions.com"
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_SECRET }}
-          SOURCE_DIR: "build/distributions"
-          DEST_DIR: "ortussolutions/boxlang-modules/${{ env.MODULE_ID }}/${{ env.VERSION }}"
+          SOURCE_DIR: "build/artifacts"
+          DEST_DIR: "ortussolutions/boxlang-modules/${{ env.MODULE_ID }}/${{ env.MODULE_VERSION }}"
 
-      - name: Upload API Docs to S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read
-        env:
-          AWS_S3_BUCKET: "apidocs.ortussolutions.com"
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_SECRET }}
-          SOURCE_DIR: "build/docs/javadoc"
-          DEST_DIR: "boxlang-modules/${{ env.MODULE_ID }}/${{ env.VERSION }}"
+      # - name: Upload API Docs to S3
+      #   uses: jakejarvis/s3-sync-action@master
+      #   with:
+      #     args: --acl public-read
+      #   env:
+      #     AWS_S3_BUCKET: "apidocs.ortussolutions.com"
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_SECRET }}
+      #     SOURCE_DIR: "build/docs/javadoc"
+      #     DEST_DIR: "boxlang-modules/${{ env.MODULE_ID }}/${{ env.VERSION }}"
 
       - name: Publish to ForgeBox
         run: |
@@ -157,10 +145,10 @@ jobs:
         if: env.SNAPSHOT == 'false'
         id: create_release
         with:
-          title: ${{ env.VERSION }}
+          title: ${{ env.MODULE_VERSION }}
           changelog: changelog.md
           token: ${{ secrets.GITHUB_TOKEN }}
-          ref: refs/tags/v${{ env.VERSION }}
+          ref: refs/tags/v${{ env.MODULE_VERSION }}
 
       - name: Inform Slack
         if: ${{ always() }}
@@ -169,7 +157,7 @@ jobs:
           SLACK_CHANNEL: coding
           SLACK_COLOR: ${{ job.status }} # or a specific color like 'green' or '#ff00ff'
           SLACK_ICON_EMOJI: ":bell:"
-          SLACK_MESSAGE: "Module ${{ env.MODULE_ID }} v${{ env.VERSION }} Built with ${{ job.status }}!"
+          SLACK_MESSAGE: "Module ${{ env.MODULE_ID }} v${{ env.MODULE_VERSION }} Built with ${{ job.status }}!"
           SLACK_TITLE: "BoxLang Module ${{ env.MODULE_ID }}"
           SLACK_USERNAME: CI
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -193,11 +181,6 @@ jobs:
         with:
           ref: development
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-version: ${{ env.GRADLE }}
-
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -210,8 +193,7 @@ jobs:
 
       - name: Bump Version
         run: |
-          gradle bumpMinorVersion --stacktrace --console=plain
-          git pull
+          box bump --minor --!TagVersion
 
       - name: Commit Version Bump
         uses: EndBug/add-and-commit@v9.1.4
@@ -220,5 +202,5 @@ jobs:
           author_email: info@ortussolutions.com
           message: "Version bump"
           add: |
-            gradle.properties
+            box.json
             changelog.md

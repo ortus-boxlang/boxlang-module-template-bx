@@ -1,0 +1,69 @@
+class{
+
+	static {
+		// Source Excludes Not Added to final binary
+		excludes = [
+	        "build",
+	        "^\..*",
+	        "Build.bx",
+	        "SetupTemplate.bx"
+	    ];
+	    // Current working dir
+	    cwd = server.cli.executionPath & "/";
+	    buildDir = static.cwd & "build/module";
+	    artifactsDir = static.cwd & "build/artifacts";
+	}
+	
+	function main(){
+		var targetVersion = cliGetArgs().positional.targetVersion ?: "1.0.0"
+		var buildId = cliGetArgs().positional.buildId ?: createUUID()
+		var branch = cliGetArgs().positional.branch ?: "development"
+
+		// Create and build directories
+		var buildDirectories = [ static.buildDir, static.artifactsDir ]
+			.each( dir => {
+				if( directoryExists( dir ) ){
+					directoryDelete( dir, true )
+				}
+				directoryCreate( dir, true )
+			} )
+
+		// Copy source
+        println( "Copying source to build folder..." )
+		copy(
+			static.cwd,
+			static.buildDir
+		)
+	}
+	
+	private function copy( src, target, recurse = true ){
+        directoryList(
+			src,
+			false,
+			"path",
+			function( path ){
+	            var isExcluded = false
+	            static.excludes.each( ( item ) => {
+					if ( path.replaceNoCase( static.cwd, "", "all" ).reFindNoCase( item ) ) {
+	                    isExcluded = true
+	                }
+	            } )
+	            return !isExcluded
+			}
+		).each( ( item ) => {
+			// Copy to target
+			if ( fileExists( item ) ) {
+                println( "Copying file [#item#]" )
+                fileCopy( item, target & "/" & getFileFromPath( item ) )
+            } else {
+                println( "Copying directory [#item#]" )
+				directoryCopy(
+					item,
+					target & "/" & item.replace( src, "" ),
+					true
+				)
+            }
+        } )
+    }
+
+}

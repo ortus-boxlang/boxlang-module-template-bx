@@ -1,6 +1,6 @@
 {
 	"name": "@MODULE_NAME@",
-	"version": "@build.version@+@build.number@",
+	"version": "1.0.0",
 	"location": "https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/@MODULE_SLUG@/@build.version@/@MODULE_SLUG@-@build.version@.zip",
 	"author": "Ortus Solutions",
 	"homepage": "https://github.com/ortus-boxlang/@MODULE_SLUG@",
