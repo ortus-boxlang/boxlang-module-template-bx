@@ -95,7 +95,7 @@ class {
 		 * The module interceptors to register into the runtime
 		 */
 		interceptors = [
-			// { class="#moduleRecord.invocationPath#.interceptors.Listener", properties={} }
+			// { class="interceptors.Listener", properties={} }
 		];
 
 		/**
