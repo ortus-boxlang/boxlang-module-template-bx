@@ -11,22 +11,22 @@ class {
 
 		var moduleName = cliRead( "What is the human readable name of your module? " )
 		if( !len( moduleName ) ){
-			println( "Module Name is required" )
+			return println( "Module Name is required" )
 		}
 
 		var moduleRegisteredName = cliRead( "What is the name this module should be registered as by the BoxLang runtime? " )
 		if( !len( moduleRegisteredName ) ){
-			println( "Module Registration name is required" )
+			return println( "Module Registration name is required" )
 		}
 
 		var moduleSlug = cliRead( "What is the slug for your module? " )
 		if( !len( moduleSlug ) ){
-			println( "Module Slug is required" )
+			return println( "Module Slug is required" )
 		}
 
 		var moduleDescription = cliRead( "Short description of your module? " )
 		if( !len( moduleDescription ) ){
-			println( "Module Description is required" )
+			return println( "Module Description is required" )
 		}
 
 		tokenReplace(
@@ -55,7 +55,7 @@ class {
 	}
 
 	private function tokenReplace(
-		required token, 
+		required token,
 		required replacement
 	){
 		var excludes = [ "^\.git", "SetupTemplate.bx" ]
