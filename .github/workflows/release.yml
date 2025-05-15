@@ -84,7 +84,11 @@ jobs:
         run: |
           npm install -g markdownlint-cli
           markdownlint changelog.md --fix
-          boxlang Build.bx
+          boxlang Build.bx \
+            --projectName=${{ env.MODULE_ID }} \
+            --buildId=${{ env.BUILD_ID }} \
+            --version=${{ env.MODULE_VERSION }} \
+            --branch=${{ env.BRANCH }}
 
       - name: Commit Changelog [unreleased] with latest version
         uses: EndBug/add-and-commit@v9.1.4

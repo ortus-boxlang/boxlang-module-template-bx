@@ -24,14 +24,15 @@ class{
 
 	function main( args = [] ){
 		// Prep incoming arguments
-		var positionals = cliGetArgs().positionals;
-		variables.projectName = positionals.projectName ?: "MyModule"
-		variables.version = positionals.version ?: "1.0.0"
-		variables.buildId = positionals.buildId ?: createUUID()
-		variables.branch = positionals.branch ?: "development"
+		var options = cliGetArgs().options;
+		variables.projectName = options.projectName ?: "MyModule"
+		variables.version = options.version ?: "1.0.0"
+		variables.buildId = options.buildId ?: createUUID()
+		variables.branch = options.branch ?: "development"
 
 		println( "🛠️ Building module..." )
-		println( "	⚙️ Options: #positionals.toString()#" )
+		println( "⚙️ Options:" )
+		println( options )
 
 		// Create and build directories
 		var buildDirectories = [ static.buildDir, static.artifactsDir ]

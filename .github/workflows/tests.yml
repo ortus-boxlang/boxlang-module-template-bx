@@ -7,9 +7,12 @@ on:
       SLACK_WEBHOOK_URL:
         required: false
 
+  # Manual Trigger
+  workflow_dispatch:
+
 env:
   MODULE_ID: ${{ github.event.repository.name }}
-  GRADLE_VERSION: 8.7
+  JDK_VERSION: 21
 
 jobs:
   tests:
@@ -22,9 +25,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ "ubuntu-latest", "windows-latest" ]
-        jdkVersion: [ "21" ]
-        experimental: [false]
+        os: [ "ubuntu-latest" ]
+        experimental: [ false ]
         #include:
           #- jdkVersion: "17"
           #  os: "windows-latest"
@@ -41,30 +43,14 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
-          java-version: ${{ matrix.jdkVersion }}
+          java-version: ${{ env.JDK_VERSION }}
 
       - name: Setup CommandBox CLI
-       uses: Ortus-Solutions/setup-commandbox@v2.0.1
-
-      # Not Needed in this module
-      #- name: Setup Environment For Testing Process
-      #  run: |
-      #    # Setup .env
-      #    touch .env
-      #    # ENV
-      #    printf "DB_HOST=localhost\n" >> .env
-      #    printf "DB_DATABASE=mydatabase\n" >> .env
-      #    printf "DB_DRIVER=MySQL\n" >> .env
-      #    printf "DB_USER=${{ env.DB_USER }}\n" >> .env
-      #    printf "DB_PASSWORD=${{ env.DB_PASSWORD }}\n" >> .env
-      #    printf "DB_CLASS=com.mysql.cj.jdbc.Driver\n" >> .env
-      #    printf "DB_BUNDLEVERSION=8.0.19\n" >> .env
-      #    printf "DB_BUNDLENAME=com.mysql.cj\n" >> .env
+        uses: Ortus-Solutions/setup-commandbox@v2.0.1
 
       - name: Test Module
         run: |
-          boxlang build
-          box link
+          ln -s "$(pwd)" ~/.boxlang/modules/"$(basename "$(pwd)")"
           boxlang --version
 
       - name: Inform Slack

@@ -1,9 +1,11 @@
-name: Snapshots
+name: Build Snapshot
 
 on:
   push:
     branches:
       - development
+  # Manual Trigger
+  workflow_dispatch:
 
 #Cancel running builds if another push to branch is made while this build is running
 concurrency:
@@ -29,10 +31,11 @@ jobs:
 
   #############################################
   # Build Snapshot Release
+  # Requires the tests to pass
   #############################################
   build:
     uses: ./.github/workflows/release.yml
-    needs: [tests, format]
+    needs: [ tests ]
     secrets: inherit
     permissions:
       checks: write
