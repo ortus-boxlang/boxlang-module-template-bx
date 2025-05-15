@@ -3,6 +3,10 @@
  */
 class {
 
+	static{
+		downloadUrl = "https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/@MODULE_SLUG@/@build.version@/@MODULE_SLUG@-@build.version@.zip"
+	}
+
 	/**
 	 * Setup the module template
 	 */
@@ -28,6 +32,18 @@ class {
 		if( !len( moduleSlug ) ){
 			return println( "Module Slug is required" )
 		}
+
+		var forgeBoxStorage = cliRead( "Do you want to store the module in FORGEBOX when publishing? (Y/N) " ).booleanFormat()
+		var forgeBoxStorageUrl = "forgeboxStorage";
+		if( !forgeBoxStorage ){
+			forgeBoxStorageUrl = static.downloadUrl.replaceNoCase( "@MODULE_SLUG@", moduleSlug )
+		}
+
+		Build::tokenReplace(
+			targetDir = variables.cwd,
+			token       = "@MODULE_STORAGE@",
+			replacement = forgeBoxStorageUrl
+		)
 
 		Build::tokenReplace(
 			targetDir = variables.cwd,

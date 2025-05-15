@@ -18,7 +18,7 @@
 
 @MODULE_DESCRIPTION@
 
----- 
+----
 
 This template can be used to create Ortus based BoxLang Modules written in BoxLang. To use, just click the `Use this Template` button in the github repository: https://github.com/ortus-boxlang/boxlang-module-template-bx and run the setup task from where you cloned it.
 
@@ -32,23 +32,23 @@ The `SetupTemplate` task will ask you for your module name, id and description a
 
 Here is a brief overview of the directory structure:
 
--   `.github/workflows` - These are the github actions to test and build the module via CI
--   `.vscode` - VScode additions
--   `bifs` - Where you can code Built in Functions for BoxLang
--   `components` - Where you can code BoxLang components
--   `interceptors` - Where you can code BoxLang interceptors
--   `lib` - Place any Jar's or classes for your module that will be class loaded for you
--   `models` - Any models available to the runtime using `bxModules.{mapping}.models` path
--   `.cfformat.json` - A format config using the Ortus Standards
--   `.editorconfig` - Smooth consistency between editors
--   `.gitattributes` - Git attributes
--   `.gitignore` - Basic ignores. Modify as needed.
--   `.markdownlint.json` - A linting file for markdown docs
--   `box.json` - The box.json for your module used to publish to ForgeBox
--   `changelog.md` - A nice changelog tracking file
--   `CONTRIBUTING.md` - A contribution guideline
--   `ModuleConfig.bx` - Your module's configuration file
--   `readme.md` - Your module's readme. Modify as needed.
+- `.github/workflows` - These are the github actions to test and build the module via CI
+- `.vscode` - VScode additions
+- `bifs` - Where you can code Built in Functions for BoxLang
+- `components` - Where you can code BoxLang components
+- `interceptors` - Where you can code BoxLang interceptors
+- `lib` - Place any Jar's or classes for your module that will be class loaded for you
+- `models` - Any models available to the runtime using `bxModules.{mapping}.models` path
+- `.cfformat.json` - A format config using the Ortus Standards
+- `.editorconfig` - Smooth consistency between editors
+- `.gitattributes` - Git attributes
+- `.gitignore` - Basic ignores. Modify as needed.
+- `.markdownlint.json` - A linting file for markdown docs
+- `box.json` - The box.json for your module used to publish to ForgeBox
+- `changelog.md` - A nice changelog tracking file
+- `CONTRIBUTING.md` - A contribution guideline
+- `ModuleConfig.bx` - Your module's configuration file
+- `readme.md` - Your module's readme. Modify as needed.
 
 ## Local Building
 
@@ -65,17 +65,16 @@ If you want to build the module, you can use `boxlang Build.bx` to build the mod
 boxlang Build.bx --projectName=MyModule --version=1.1.0
 ```
 
+## Version Management
+
+This module uses [SemVer](https://semver.org/) for versioning.  The version is stored in the `box.json` file and is used to publish to FORGEBOX and the GithubActions will atuomatically bump it for you.  The version is also used to tag the repo for releases.
+
 ## Github Actions Automation
 
-The Github actions will clone, test, package, and deploy your module to ForgeBox and the Ortus S3 accounts for API Docs and Artifacts. Please make sure the following environment variables are set in your repository.
+This repo has all kinds of automation for PRs, snapshots, tests and releases.  Use them as you see fit.
+If you will be doing FORGEBOX publishing, then you will need to set up a FORGEBOX API key in the secrets of your repository.
 
-> Please note that most of them are already defined at the org level
-
--   `FORGEBOX_TOKEN` - The Ortus ForgeBox API Token
--   `AWS_ACCESS_KEY` - The travis user S3 account
--   `AWS_ACCESS_SECRET` - The travis secret S3
-
-> Please contact the admins in the `#infrastructure` channel for these credentials if needed
+- `FORGEBOX_API_TOKEN` - This is your FORGEBOX API key. You can get it from your FORGEBOX account settings.  This is used to publish to FORGEBOX.
 
 ## Ortus Sponsors
 

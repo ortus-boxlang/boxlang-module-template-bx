@@ -1,7 +1,7 @@
 {
 	"name": "@MODULE_NAME@",
 	"version": "1.0.0",
-	"location": "https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/@MODULE_SLUG@/@build.version@/@MODULE_SLUG@-@build.version@.zip",
+	"location": "@MODULE_STORAGE@",
 	"author": "Ortus Solutions",
 	"homepage": "https://github.com/ortus-boxlang/@MODULE_SLUG@",
 	"documentation": "https://github.com/ortus-boxlang/@MODULE_SLUG@",
@@ -13,7 +13,9 @@
 	"slug": "@MODULE_SLUG@",
 	"shortDescription": "@MODULE_DESCRIPTION@",
 	"type": "boxlang-modules",
-	"keywords": ["boxlang"],
+	"keywords": [
+		"boxlang"
+	],
 	"boxlang": {
 		"minimumVersion": "1.0.0",
 		"moduleName": "@MODULE_REGISTERED_NAME@"
