@@ -50,9 +50,24 @@ Here is a brief overview of the directory structure:
 -   `ModuleConfig.bx` - Your module's configuration file
 -   `readme.md` - Your module's readme. Modify as needed.
 
+## Local Building
+
+If you want to build the module, you can use `boxlang Build.bx` to build the module.  Here are the options you can pass to the script:
+
+| Option      | Required | Default Value | Description                                  |
+|-------------|----------|---------------|----------------------------------------------|
+| `projectName` | Yes      | N/A           | The name of the project.                   |
+| `version`   | No       | `1.0.0`       | The version of the module.                   |
+| `branch`    | No       | `development` | The branch being built.                      |
+| `buildId`   | No       | UUID (generated) | A unique identifier for the build.         |
+
+```bash
+boxlang Build.bx --projectName=MyModule --version=1.1.0
+```
+
 ## Github Actions Automation
 
-The github actions will clone, test, package, deploy your module to ForgeBox and the Ortus S3 accounts for API Docs and Artifacts. So please make sure the following environment variables are set in your repository.
+The Github actions will clone, test, package, and deploy your module to ForgeBox and the Ortus S3 accounts for API Docs and Artifacts. Please make sure the following environment variables are set in your repository.
 
 > Please note that most of them are already defined at the org level
 
