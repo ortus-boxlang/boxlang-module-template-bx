@@ -38,7 +38,6 @@ Here is a brief overview of the directory structure:
 - `components` - Where you can code BoxLang components
 - `interceptors` - Where you can code BoxLang interceptors
 - `lib` - Place any Jar's or classes for your module that will be class loaded for you
-- `models` - Any models available to the runtime using `bxModules.{mapping}.models` path
 - `.cfformat.json` - A format config using the Ortus Standards
 - `.editorconfig` - Smooth consistency between editors
 - `.gitattributes` - Git attributes
