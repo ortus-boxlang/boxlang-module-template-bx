@@ -1,23 +1,37 @@
 class{
 
+	property name="projectName";
+	property name="version";
+	property name="buildId";
+	property name="branch";
+
 	static {
 		// Source Excludes Not Added to final binary
 		excludes = [
-	        "build",
 	        "^\..*",
+	        "build",
 	        "Build.bx",
-	        "SetupTemplate.bx"
+			"docker-compose.yml",
+	        "SetupTemplate.bx",
+			"server-.*\.json",
+			"tests"
 	    ];
-	    // Current working dir
+	    // Current working directories
 	    cwd = server.cli.executionPath & "/";
 	    buildDir = static.cwd & "build/module";
 	    artifactsDir = static.cwd & "build/artifacts";
 	}
-	
-	function main(){
-		var targetVersion = cliGetArgs().positional.targetVersion ?: "1.0.0"
-		var buildId = cliGetArgs().positional.buildId ?: createUUID()
-		var branch = cliGetArgs().positional.branch ?: "development"
+
+	function main( args = [] ){
+		// Prep incoming arguments
+		var positionals = cliGetArgs().positionals;
+		variables.projectName = positionals.projectName ?: "MyModule"
+		variables.version = positionals.version ?: "1.0.0"
+		variables.buildId = positionals.buildId ?: createUUID()
+		variables.branch = positionals.branch ?: "development"
+
+		println( "🛠️ Building module..." )
+		println( "	⚙️ Options: #positionals.toString()#" )
 
 		// Create and build directories
 		var buildDirectories = [ static.buildDir, static.artifactsDir ]
@@ -29,14 +43,67 @@ class{
 			} )
 
 		// Copy source
-        println( "Copying source to build folder..." )
+        println( "✨ Building source..." )
 		copy(
 			static.cwd,
 			static.buildDir
 		)
+		// Create build ID
+		fileWrite(
+			"#static.buildDir#/#projectName#-#version#+#buildID#.md",
+			"Built with ❤️ love ❤️ on #dateTimeFormat( now(), "full" )#"
+		);
+
+		// Updating Version + ID Placeholders
+		println( "📚 Updating version and build ID..." )
+		tokenReplace(
+			static.buildDir,
+			"@build.version@",
+			variables.version
+		)
+		tokenReplace(
+			static.buildDir,
+			( variables.branch == "main" ? "@build.number@" : "+@build.number@" ),
+			( variables.branch == "main" ? variables.buildID : "-snapshot" )
+		)
+
+		// zip up source
+		var destination = "#static.artifactsDir#/#variables.projectName#-#variables.version#.zip";
+		println( "📦 Zipping code to [#destination#]..." )
+		compress(
+			destination : destination,
+			format : "zip",
+			source : static.buildDir,
+			overwrite : true,
+			recurse : true
+		)
+		fileCopy( static.buildDir & "/box.json", static.artifactsDir & "/box.json" )
+		fileCopy( static.buildDir & "/changelog.md", static.artifactsDir & "/changelog.md" )
+
+		// Build checksums: sha-512, md5
+		println( "🔑 Building checksums..." )
+		buildCheckSum(
+			destination,
+			"sha-512",
+			"sha512"
+		)
+		buildCheckSum(
+			destination,
+			"md5",
+			"md5"
+		)
+
+		println( "🔥 Build complete! 🔥" )
 	}
-	
-	private function copy( src, target, recurse = true ){
+
+	/**
+	 * Copy files and directories from source to target with filters
+	 *
+	 * @src Source directory
+	 * @target Target directory
+	 * @recurse Recurse into directories
+	 */
+	static public function copy( src, target, recurse = true ){
         directoryList(
 			src,
 			false,
@@ -53,10 +120,10 @@ class{
 		).each( ( item ) => {
 			// Copy to target
 			if ( fileExists( item ) ) {
-                println( "Copying file [#item#]" )
+                println( "	📄 Copying file [#item#]" )
                 fileCopy( item, target & "/" & getFileFromPath( item ) )
             } else {
-                println( "Copying directory [#item#]" )
+                println( "	📂 Copying directory [#item#]" )
 				directoryCopy(
 					item,
 					target & "/" & item.replace( src, "" ),
@@ -65,5 +132,57 @@ class{
             }
         } )
     }
+
+	/**
+	 * Replace tokens in files
+	 *
+	 * @targetDir Target directory
+	 * @token Token to replace
+	 * @replacement Replacement string
+	 * @excludes Excluded files and directories
+	 */
+	static public function tokenReplace(
+		required targetDir,
+		required token,
+		required replacement,
+		excludes = [ "^\.git", "SetupTemplate.bx" ],
+		boolean verbose = false
+	){
+		directoryList( targetDir, true, "array", "*.*", "asc", "file" )
+			.filter( item => {
+				var targetPath = item.replaceNoCase( targetDir, "" )
+				return !excludes.some( pattern => targetPath.reFindNoCase( pattern ) )
+			} )
+			.each( item => {
+				var targetPath = item.replaceNoCase( targetDir, "" )
+				var content = fileRead( item )
+				if( content.findNoCase( token ) ){
+					if( verbose )
+						println( "	> Replacing token in [#targetPath#]" );
+					fileWrite( item, content.replaceNoCase( token, replacement, "all" ) )
+				} else{
+					if( verbose )
+						println( "	x Skipping, token not found on [#targetPath#]" )
+				}
+
+			} )
+	}
+
+	static public function buildCheckSum( required filePath, algorithm="md5", extension="md5" ){
+		var algorithms = [
+			"md5",
+			"sha1",
+			"sha-256",
+			"sha-512"
+		]
+		if( !algorithms.contains( algorithm ) ){
+			throw( "Invalid algorithm [#algorithm#], must be one of [#algorithms.toList()#]" )
+		}
+		var thisHash = hash( fileReadBinary( filePath ), algorithm );
+		fileWrite(
+			filePath & "." & extension,
+			thisHash
+		)
+	}
 
 }

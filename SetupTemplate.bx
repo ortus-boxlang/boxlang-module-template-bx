@@ -14,67 +14,49 @@ class {
 			return println( "Module Name is required" )
 		}
 
-		var moduleRegisteredName = cliRead( "What is the name this module should be registered as by the BoxLang runtime? " )
-		if( !len( moduleRegisteredName ) ){
-			return println( "Module Registration name is required" )
-		}
-
-		var moduleSlug = cliRead( "What is the slug for your module? " )
-		if( !len( moduleSlug ) ){
-			return println( "Module Slug is required" )
-		}
-
 		var moduleDescription = cliRead( "Short description of your module? " )
 		if( !len( moduleDescription ) ){
 			return println( "Module Description is required" )
 		}
 
-		tokenReplace(
+		var moduleRegisteredName = cliRead( "What is the name this module should be registered as by the BoxLang runtime (Avoid hypens if necesary) ? (Ex: bxorm, ai, oshi) " )
+		if( !len( moduleRegisteredName ) ){
+			return println( "Module Registration name is required" )
+		}
+
+		var moduleSlug = cliRead( "What is the FORGEBOX slug for your module? (Ex: bx-orm, bx-pdf, bx-mymodule) " )
+		if( !len( moduleSlug ) ){
+			return println( "Module Slug is required" )
+		}
+
+		Build::tokenReplace(
+			targetDir = variables.cwd,
 			token       = "@MODULE_NAME@",
 			replacement = moduleName
 		)
 
-		tokenReplace(
+		Build::tokenReplace(
+			targetDir = variables.cwd,
 			token       = "@MODULE_REGISTERED_NAME@",
 			replacement = moduleRegisteredName
 		)
 
-		tokenReplace(
+		Build::tokenReplace(
+			targetDir = variables.cwd,
 			token       = "@MODULE_SLUG@",
 			replacement = moduleSlug
 		)
 
-		tokenReplace(
+		Build::tokenReplace(
+			targetDir = variables.cwd,
 			token       = "@MODULE_DESCRIPTION@",
 			replacement = moduleDescription
 		)
 
 		// Finalize Message
-		println( "Your module template is now ready for development! Just add the github origin, commit some code and Go rock it!" )
-		println( "You can delete this file now!" )
-	}
-
-	private function tokenReplace(
-		required token,
-		required replacement
-	){
-		var excludes = [ "^\.git", "SetupTemplate.bx" ]
-		directoryList( variables.cwd, true, "array", "*.*", "asc", "file" )
-			.filter( item => {
-				var targetPath = item.replaceNoCase( variables.cwd, "" )
-				return !excludes.some( pattern => targetPath.reFindNoCase( pattern ) )
-			} )
-			.each( item => {
-				var targetPath = item.replaceNoCase( variables.cwd, "" )
-				var content = fileRead( item )
-				if( content.findNoCase( token ) ){
-					println( "> Replacing token in [#targetPath#]" );
-					//fileWrite( item, content.replaceNoCase( token, replacement, "all" ) )
-				} else{
-					println( "x Skipping, token not found on [#targetPath#]" )
-				}
-
-			} )
+		println( "" );
+		println( "✅ Your module template is now ready for development! Just add the github origin, commit some code and Go rock it!" )
+		println( "✅ You can delete this file now!" )
 	}
 
 }
