@@ -12,3 +12,7 @@ bin/**
 
 ### Mac OS ###
 .DS_Store
+
+# Dependencies
+testbox/**
+tests/results/**
