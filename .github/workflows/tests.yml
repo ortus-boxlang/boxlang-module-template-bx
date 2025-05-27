@@ -50,6 +50,7 @@ jobs:
 
       - name: Test Module
         run: |
+          mkdir -p ~/.boxlang/modules
           ln -s "$(pwd)" ~/.boxlang/modules/"$(basename "$(pwd)")"
           boxlang --version
 
