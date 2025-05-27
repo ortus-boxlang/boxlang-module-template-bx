@@ -33,9 +33,12 @@ class {
 			return println( "Module Slug is required" )
 		}
 
-		var forgeBoxStorage = cliRead( "Do you want to store the module in FORGEBOX when publishing? (Y/N) " ).booleanFormat()
+		var forgeBoxStorage = cliRead( "Do you want to store the module in FORGEBOX when publishing? (y/N) " ).trim()
+		if( !len( forgeBoxStorage ) ){
+			forgeBoxStorage = "N"
+		}
 		var forgeBoxStorageUrl = "forgeboxStorage";
-		if( !forgeBoxStorage ){
+		if( !booleanFormat( forgeBoxStorage ) ){
 			forgeBoxStorageUrl = static.downloadUrl.replaceNoCase( "@MODULE_SLUG@", moduleSlug )
 		}
 
