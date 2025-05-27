@@ -51,6 +51,8 @@ Here is a brief overview of the directory structure:
 
 ## Local Building
 
+The `Build.bx` is used to package your module so it can be distributed to FORGEBOX or to a friend.  It will create a zip file in the `build` directory with the name of your module and the version number.  The zip file will contain all the files needed to run your module, including the `box.json` file, the `ModuleConfig.bx` file, and any other files you have in your module.
+
 If you want to build the module, you can use `boxlang Build.bx` to build the module.  Here are the options you can pass to the script:
 
 | Option      | Required | Default Value | Description                                  |
