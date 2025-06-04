@@ -57,13 +57,12 @@ If you want to build the module, you can use `boxlang Build.bx` to build the mod
 
 | Option      | Required | Default Value | Description                                  |
 |-------------|----------|---------------|----------------------------------------------|
-| `projectName` | Yes      | N/A           | The name of the project.                   |
 | `version`   | No       | `1.0.0`       | The version of the module.                   |
 | `branch`    | No       | `development` | The branch being built.                      |
 | `buildId`   | No       | UUID (generated) | A unique identifier for the build.         |
 
 ```bash
-boxlang Build.bx --projectName=MyModule --version=1.1.0
+boxlang Build.bx --version=1.1.0
 ```
 
 ## Version Management

@@ -1,6 +1,6 @@
 class{
 
-	property name="projectName";
+	property name="moduleSlug";
 	property name="version";
 	property name="buildId";
 	property name="branch";
@@ -25,7 +25,7 @@ class{
 	function main( args = [] ){
 		// Prep incoming arguments
 		var options = cliGetArgs().options;
-		variables.projectName = options.projectName ?: "MyModule"
+		variables.moduleSlug = "@MODULE_SLUG@";
 		variables.version = options.version ?: "1.0.0"
 		variables.buildId = options.buildId ?: createUUID()
 		variables.branch = options.branch ?: "development"
@@ -51,7 +51,7 @@ class{
 		)
 		// Create build ID
 		fileWrite(
-			"#static.buildDir#/#projectName#-#version#+#buildID#.md",
+			"#static.buildDir#/#variables.moduleSlug#-#version#+#buildID#.md",
 			"Built with ❤️ love ❤️ on #dateTimeFormat( now(), "full" )#"
 		);
 
@@ -69,7 +69,7 @@ class{
 		)
 
 		// zip up source
-		var destination = "#static.artifactsDir#/#variables.projectName#-#variables.version#.zip";
+		var destination = "#static.artifactsDir#/#variables.moduleSlug#-#variables.version#.zip";
 		println( "📦 Zipping code to [#destination#]..." )
 		compress(
 			destination : destination,
@@ -146,10 +146,10 @@ class{
 		required targetDir,
 		required token,
 		required replacement,
-		excludes = [ "^\.git", "SetupTemplate.bx" ],
+		excludes = [ "^\.git", "SetupTemplate.bx", "Test.bx" ],
 		boolean verbose = false
 	){
-		directoryList( targetDir, true, "array", "*.*", "asc", "file" )
+		directoryList( arguments.targetDir, true, "array", "*.*", "asc", "file" )
 			.filter( item => {
 				var targetPath = item.replaceNoCase( targetDir, "" )
 				return !excludes.some( pattern => targetPath.reFindNoCase( pattern ) )
@@ -157,18 +157,27 @@ class{
 			.each( item => {
 				var targetPath = item.replaceNoCase( targetDir, "" )
 				var content = fileRead( item )
+
 				if( content.findNoCase( token ) ){
 					if( verbose )
-						println( "	> Replacing token in [#targetPath#]" );
-					fileWrite( item, content.replaceNoCase( token, replacement, "all" ) )
+						println( "✅ Replacing token in [#targetPath#]" );
+					var newContent = content.replaceNoCase( token, replacement, "all" );
+					fileWrite( item, newContent )
 				} else{
 					if( verbose )
-						println( "	x Skipping, token not found on [#targetPath#]" )
+						println( "- Skipping, token not found on [#targetPath#]" )
 				}
-
-			} )
+			} );
 	}
 
+	/**
+	 * Builds a checksum for a file and writes it to a file with the specified extension.
+	 *
+	 * @filePath The path to the file for which the checksum is to be built.
+	 * @algorithm The hashing algorithm to use (default is "md5"). Supported algorithms: "md5", "sha1", "sha-256", "sha-512".
+	 * @extension The extension for the checksum file (default is "md5").
+	 * @throws If the specified algorithm is not supported.
+	 */
 	static public function buildCheckSum( required filePath, algorithm="md5", extension="md5" ){
 		var algorithms = [
 			"md5",

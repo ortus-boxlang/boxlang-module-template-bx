@@ -1,0 +1,15 @@
+class{
+
+	function main(){
+		variables.cwd = server.cli.executionPath & "/"
+
+		Build::tokenReplace(
+			targetDir = variables.cwd,
+			token       = "@MODULE_NAME@",
+			replacement = "TestBX",
+			verbose = true
+		)
+
+
+	}
+}

@@ -43,16 +43,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup BoxLang
+        uses: ortus-boxlang/setup-boxlang@1.0.0
+
       - name: Setup CommandBox
         uses: Ortus-Solutions/setup-commandbox@v2.0.1
         with:
           forgeboxAPIKey: ${{ secrets.FORGEBOX_API_TOKEN }}
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: ${{ env.JDK }}
 
       - name: Setup Environment Variables For Build Process
         id: current_version
@@ -85,7 +82,6 @@ jobs:
           npm install -g markdownlint-cli
           markdownlint changelog.md --fix
           boxlang Build.bx \
-            --projectName=${{ env.MODULE_ID }} \
             --buildId=${{ env.BUILD_ID }} \
             --version=${{ env.MODULE_VERSION }} \
             --branch=${{ env.BRANCH }}
