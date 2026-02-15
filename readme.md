@@ -3,8 +3,8 @@
 ```
 |:------------------------------------------------------:|
 | ⚡︎ B o x L a n g ⚡︎
-| Dynamic : Modular : Productive
-|:------------------------------------------------------:|
+| Dynamic : Modular : Productive |
+| :----------------------------: |
 ```
 
 <blockquote>
@@ -55,15 +55,20 @@ The `Build.bx` is used to package your module so it can be distributed to FORGEB
 
 If you want to build the module, you can use `boxlang Build.bx` to build the module.  Here are the options you can pass to the script:
 
-| Option      | Required | Default Value | Description                                  |
-|-------------|----------|---------------|----------------------------------------------|
-| `version`   | No       | `1.0.0`       | The version of the module.                   |
-| `branch`    | No       | `development` | The branch being built.                      |
-| `buildId`   | No       | UUID (generated) | A unique identifier for the build.         |
+| Option    | Required | Default Value    | Description                        |
+| --------- | -------- | ---------------- | ---------------------------------- |
+| `version` | No       | `1.0.0`          | The version of the module.         |
+| `branch`  | No       | `development`    | The branch being built.            |
+| `buildId` | No       | UUID (generated) | A unique identifier for the build. |
 
 ```bash
 boxlang Build.bx --version=1.1.0
 ```
+
+## Running Tests
+
+1. With CommandBox installed, install testbox: `box install`
+2. With the Boxlang CLI installed, run tests using `./testbox/run`
 
 ## Version Management
 

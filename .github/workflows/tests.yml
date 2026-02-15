@@ -48,6 +48,9 @@ jobs:
           ln -s "$(pwd)" ~/.boxlang/modules/"$(basename "$(pwd)")"
           boxlang --version
 
+      - name: Run Tests
+        run:  ./testbox/run --reporter=ANTJunit
+
       # UNCOMMENT THE FOLLOWING LINES TO ENABLE SLACK NOTIFICATIONS
       # - name: Inform Slack
       #   if: ${{ failure() && github.ref == 'refs/heads/development' }}
