@@ -27,20 +27,21 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         experimental: [false]
-        #include:
-        #- jdkVersion: "17"
-        #  os: "windows-latest"
-        #  experimental: true
-        # Disabled for now until we can figure out the gradle matrix
-        #- jdkVersion: "17"
-        #  os: "ubuntu-latest"
-        #  experimental: true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
 
       - name: Setup BoxLang
         uses: ortus-boxlang/setup-boxlang@1.3.0
+        with:
+          with-commandbox: true
+          modules: bx-esapi
+
+      - name: Check BoxLang Version
+        run: boxlang --version
+
+      - name: Install Dev Dependencies
+        run: box install id=testbox --verbose --nosave
 
       - name: Test Module
         run: |
@@ -49,7 +50,17 @@ jobs:
           boxlang --version
 
       - name: Run Tests
-        run:  ./testbox/run --reporter=ANTJunit
+        run: |
+          ./testbox/run --reporter=ANTJunit --verbose
+          mv tests/results/report.txt tests/results/junit.xml
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tests-${{ matrix.os }}
+          path: |
+            tests/results/**
 
       # UNCOMMENT THE FOLLOWING LINES TO ENABLE SLACK NOTIFICATIONS
       # - name: Inform Slack
