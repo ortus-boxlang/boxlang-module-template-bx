@@ -61,12 +61,15 @@ class{
 			static.buildDir,
 			"@build.version@",
 			variables.version
-		)
+		);
 		tokenReplace(
 			static.buildDir,
 			( variables.branch == "main" ? "@build.number@" : "+@build.number@" ),
 			( variables.branch == "main" ? variables.buildID : "-snapshot" )
-		)
+		);
+
+		println( "📦 Compiling module..." )
+		bx:execute name="boxlang" arguments="compile --target #static.buildDir#";
 
 		// zip up source
 		var destination = "#static.artifactsDir#/#variables.moduleSlug#-#variables.version#.zip";
